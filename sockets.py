@@ -30,6 +30,7 @@ class World:
     def __init__(self):
         self.clear()
         # we've got listeners now!
+        self.space = {}
         self.listeners = list()
         
     def add_set_listener(self, listener):
@@ -45,10 +46,10 @@ class World:
         self.space[entity] = data
         self.update_listeners( entity )
 
-    def update_listeners(self, entity):
+    def update_listeners(self, message):
         '''update the set listeners'''
         for listener in self.listeners:
-            listener(entity, self.get(entity))
+            listener(message)
 
     def clear(self):
         self.space = dict()
@@ -61,10 +62,7 @@ class World:
 
 myWorld = World()        
 
-def set_listener( entity, data ):
-    ''' do something with the update ! '''
 
-myWorld.add_set_listener( set_listener )
         
 @app.route('/')
 def hello():
@@ -80,13 +78,15 @@ def read_ws(ws,client):
 def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
-    count = 1
+   
     while not ws.closed:
         message = ws.receive()
-        ws.send(f"{count}")
-        count += 1
-
-
+        if ws.send in myWorld.listeners:
+            myWorld.update_listeners(message)
+            print('updating...')
+        else:
+            myWorld.add_set_listener(ws.send)
+            ws.send(message)
 
 # I give this to you, this is how you get the raw body/data portion of a post in flask
 # this should come with flask but whatever, it's not my project.

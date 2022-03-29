@@ -249,22 +249,23 @@ function update() {
     drawFrame();
 }
 
-
 function wsSetup() {
     var url = "ws://"+host+"/subscribe";   
     socket = new WebSocket(url);
     socket.onopen = function(msg) {
         //XXX: TODO What are you going to do here?
-        socket.send(JSON.stringify(world))
+        socket.send(JSON.stringify({}))
     };
     socket.onerror = function(msg) {
         debug("WebSocket Error:" + msg.data);
     };
     socket.onmessage = function(msg) {  
         try {
-            debug("WebSocket Recv: " + msg.data);
-            //XXX: TODO What are you going to do here?      
-            //world = JSON.parse(msg.data)
+            debug("WebSocket Recv: it's working");
+            //XXX: TODO What are you going to do here? 
+            //console.log(msg.data)
+            world = JSON.parse(msg.data)
+            //drawNextFrame()
         } catch (e) {
             alert("socket on message: " + e);
         }
