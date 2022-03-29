@@ -81,9 +81,9 @@ def subscribe_socket(ws):
    
     while not ws.closed:
         message = ws.receive()
+        myWorld.space = message
         if ws.send in myWorld.listeners:
             myWorld.update_listeners(message)
-            print('updating...')
         else:
             myWorld.add_set_listener(ws.send)
             ws.send(message)
