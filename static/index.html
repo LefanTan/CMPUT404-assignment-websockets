@@ -20,7 +20,7 @@
         See the License for the specific language governing permissions and
         limitations under the License.
     "/>
-    <script src="json2.js"></script>
+    <script src="json2.js" ></script>
   </head> 
   <body bgcolor="white" height="100%" width="100%"> 
     <div id="debug"></div>
@@ -125,6 +125,7 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
+    socket.send(JSON.stringify(world))
 }
 var counter = 0;
 function addEntityWithoutName(data) {
@@ -252,16 +253,18 @@ function update() {
 function wsSetup() {
     var url = "ws://"+host+"/subscribe";   
     socket = new WebSocket(url);
-    socket.onopen = function() {
+    socket.onopen = function(msg) {
         //XXX: TODO What are you going to do here?
+        socket.send(JSON.stringify(world))
     };
     socket.onerror = function(msg) {
         debug("WebSocket Error:" + msg.data);
     };
     socket.onmessage = function(msg) {  
         try {
-            debug("WebSocket Recv:" + msg.data);
-            //XXX: TODO What are you going to do here?            
+            debug("WebSocket Recv: " + msg.data);
+            //XXX: TODO What are you going to do here?      
+            //world = JSON.parse(msg.data)
         } catch (e) {
             alert("socket on message: " + e);
         }
@@ -269,9 +272,6 @@ function wsSetup() {
 }
 
 wsSetup();
-
-
-
 
 // 30 frames per second
 setInterval( update, 1000/30.0);
